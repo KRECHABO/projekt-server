@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KRECHABO</title>
+
+    <!-- Gotycka czcionka UnifrakturMaguntia -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* NAGŁÓWEK (Gotycki) */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 15px 20px;
+            border: 2px solid #333;
+            margin-bottom: 10px;
+        }
+
+        header h1 {
+            font-family: 'UnifrakturMaguntia', cursive, serif;
+            font-size: 38px;
+            font-weight: normal;
+        }
+
+        .header-datetime {
+            border: 1px solid #333;
+            padding: 5px 10px;
+            font-size: 14px;
+            background-color: #fff;
+        }
+
+        /* PASEK NAWIGACJI / ZAKŁADKI */
+        nav {
+            background-color: #ffffff;
+            border: 2px solid #333;
+            margin-bottom: 10px;
+            padding: 5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        nav li {
+            display: flex;
+            align-items: center;
+            border: 1px solid #333;
+            background-color: #fafafa;
+            padding: 3px;
+        }
+
+        nav li input[type="text"] {
+            border: none;
+            background: transparent;
+            padding: 5px 8px;
+            font-weight: bold;
+            outline: none;
+            width: 90px;
+        }
+
+        .action-btn {
+            background: #e0e0e0;
+            border: 1px solid #333;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 2px;
+            font-weight: bold;
+        }
+
+        .action-btn:hover {
+            background-color: #ccc;
+        }
+
+        .close-btn {
+            background: #fff;
+            border: 1px solid #333;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .close-btn:hover {
+            background-color: #ff4d4d;
+            color: white;
+        }
+
+        /* KONTENER GŁÓWNY (3 KOLUMNY) */
+        .container {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .sidebar-left, .sidebar-right {
+            width: 240px;
+            background-color: #ffffff;
+            border: 2px solid #333;
+            padding: 10px;
+        }
+
+        .sidebar-left h3, .sidebar-right h4 {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        .sidebar-left ul, .sidebar-right ul {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+
+        /* INTERAKTYWNE POZYCJE NA LISTACH */
+        .clickable-item {
+            padding: 6px;
+            border-bottom: 1px dashed #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: block;
+            color: #0056b3;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .clickable-item:hover {
+            background-color: #e8f4ff;
+        }
+
+        /* ŚRODKOWA KOLUMNA (GŁÓWNY OBSZAR WYŚWIETLANIA) */
+        main {
+            flex: 1;
+            background-color: #ffffff;
+            border: 2px solid #333;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        main h2 {
+            font-size: 18px;
+            margin: 20px 0 10px 0;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+        }
+
+        .content-frame {
+            width: 100%;
+            height: 480px;
+            border: 1px solid #ccc;
+            margin-bottom: 15px;
+        }
+
+        /* STYLE ESP32 & PRZYCISKI */
+        .btn {
+            display: inline-block;
+            padding: 6px 10px;
+            border: 1px solid #333;
+            background-color: #eee;
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 13px;
+            margin: 2px 0;
+            border-radius: 4px;
+        }
+
+        .btn:hover { background-color: #ddd; }
+        .btn-on { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .btn-off { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+
+        /* ZOPTYMALIZOWANA KLASA DLA ZDJĘĆ */
+        .responsive-img {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+            border: 1px solid #ccc;
+            margin: 10px 0;
+            display: block;
+        }
+
+        .esp-card {
+            border: 1px solid #ccc;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            background-color: #fafafa;
+        }
+
+        .esp-card h3 {
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+
+        .esp-status-text {
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .status-badge {
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background-color: #eee;
+        }
+
+        .status-on { background-color: #28a745; color: white; }
+        .status-off { background-color: #dc3545; color: white; }
+        .status-error { background-color: #ffc107; color: black; }
+
+        /* STOPKA */
+        footer {
+            margin-top: 10px;
+            background-color: #ffffff;
+            border: 2px solid #333;
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            .sidebar-left, .sidebar-right { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAGŁÓWEK STRONY -->
+<header>
+    <h1 onclick="wypowiedzKomunikat('Nagłówek Krechabo')">KRECHABO</h1>
+    <div class="header-datetime" id="datetime">
+        Ładowanie daty...
+    </div>
+</header>
+
+<!-- PASEK NAWIGACYJNY -->
+<nav>
+    <ul>
+        <li>
+            <input type="text" value="Pod strony" aria-label="Pod strony">
+            <button class="close-btn" onclick="wypowiedzKomunikat('Zamknięto zakładkę'); closeTab(this);">X</button>
+        </li>
+        <li>
+            <input type="text" value="PDF 1" aria-label="PDF 1">
+            <button class="action-btn" onclick="loadContent('/text1.pdf', 'Otwieram dokument PDF 1')">Otwórz</button>
+            <button class="close-btn" onclick="wypowiedzKomunikat('Zamknięto zakładkę'); closeTab(this);">X</button>
+        </li>
+        <li>
+            <input type="text" value="PDF 2" aria-label="PDF 2">
+            <button class="action-btn" onclick="loadContent('/text2.pdf', 'Otwieram dokument PDF 2')">Otwórz</button>
+            <button class="close-btn" onclick="wypowiedzKomunikat('Zamknięto zakładkę'); closeTab(this);">X</button>
+        </li>
+        <li>
+            <input type="text" value="PDF 3" aria-label="PDF 3">
+            <button class="action-btn" onclick="loadContent('/text3.pdf', 'Otwieram dokument PDF 3')">Otwórz</button>
+            <button class="close-btn" onclick="wypowiedzKomunikat('Zamknięto zakładkę'); closeTab(this);">X</button>
+        </li>
+        <li>
+            <input type="text" value="Kontakt" aria-label="Kontakt">
+            <button class="close-btn" onclick="wypowiedzKomunikat('Zamknięto zakładkę'); closeTab(this);">X</button>
+        </li>
+        <li>
+            <input type="text" value="E-mail" aria-label="E-mail">
+            <button class="action-btn" onclick="wypowiedzKomunikat('Przygotowuję wiadomość email'); window.location.href='mailto:kontakt@twojadomena.pl'">Wyślij</button>
+            <button class="close-btn" onclick="wypowiedzKomunikat('Zamknięto zakładkę'); closeTab(this);">X</button>
+        </li>
+    </ul>
+</nav>
+
+<!-- UKŁAD 3-KOLUMNOWY -->
+<div class="container">
+
+    <!-- LEWY BOCZNY PASEK NAWIGACJI (FILMY) -->
+    <aside class="sidebar-left">
+        <h3>Filmy</h3>
+        <div class="clickable-item" onclick="loadContent('https://www.youtube.com/embed/vE_H3FgikkA', 'Odtwarzam główny materiał z YouTube')">YouTube Main</div>
+        <br>
+        <h3>Tytuły filmów</h3>
+        <ul>
+            <li class="clickable-item" onclick="loadContent('https://www.youtube.com/embed/vE_H3FgikkA', 'Włączam film Gołębie')">1. Gołębie</li>
+            <li class="clickable-item" onclick="loadContent('https://www.youtube.com/embed/mYK6saTrrbU', 'Włączam film Konfitura')">2. Konfitura</li>
+            <li class="clickable-item" onclick="loadContent('https://www.youtube.com/embed/8f1bLsNQOM8', 'Włączam film Twarze')">3. Twarze</li>
+            <li class="clickable-item" onclick="loadContent('https://www.youtube.com/embed/DGvn7iLi00c', 'Włączam film Osobiste')">4. Osobiste</li>
+            <li class="clickable-item" onclick="loadContent('https://www.youtube.com/embed/mzWfd8R9oTk', 'Włączam miks filmowy')">5. MIX</li>
+        </ul>
+    </aside>
+
+    <!-- GŁÓWNY OBSZAR TREŚCI -->
+    <main>
+        <h1 onclick="wypowiedzKomunikat('Do zobaczenia w piekle!')">Do zobaczenia w piekle!</h1>
+        <p style="margin-bottom: 10px;">Ta strona będzie modyfikacją standardu przekierowań. Wybierz pozycję z menu, aby podmienić zawartość okna poniżej.</p>
+
+        <!-- EKRAN WYŚWIETLANIA DYNAMICZNEGO -->
+        <iframe id="main-display-frame" class="content-frame" src="https://www.youtube.com/embed/vE_H3FgikkA" allowfullscreen></iframe>
+
+        <!-- GALERIA ZDJĘĆ -->
+        <h2>Galeria zdjęć</h2>
+
+        <img src="/zdjecie.png" alt="Moje testowe zdjęcie" class="responsive-img" onclick="wypowiedzKomunikat('Zdjęcie testowe pierwsze')">
+        <img src="/zdjecie6.png" alt="Moje testowe zdjęcie" class="responsive-img" onclick="wypowiedzKomunikat('Zdjęcie numer sześć')">
+        <img src="/zdjecie5.png" alt="Moje testowe zdjęcie" class="responsive-img" onclick="wypowiedzKomunikat('Zdjęcie numer pięć')">
+        <img src="/zdjecie7.png" alt="Moje testowe zdjęcie" class="responsive-img" onclick="wypowiedzKomunikat('Zdjęcie numer siedem')">
+
+        <p style="margin: 10px 0; font-size: 14px; line-height: 1.5;">
+            Przedstawiony schemat to układ mieszanego sterowania/zasilania odbiornika (oznaczonego jako żarówka) z dwóch źródeł: stałoprądowego (DC) oraz zmiennoprądowego (AC).<br><br>
+            <strong>1. Elementy układu:</strong><br>
+            Źródło DC (V_4 = 11 V): Zasilanie prądem stałym dołączone przez amperomierz M_3 (25,32 mA) oraz diodę D_2. W obwodzie znajduje się również potencjometr POT_1 (ustawiony jako dzielnik 410 Ω / 590 Ω).<br>
+            Źródło AC (V_2 = 99 V): Źródło napięcia przemiennego. Połączone przez amperomierz M_4 oraz układ diod D_3, D_1 i D_4.<br>
+            Obciążenie główne: Żarówka podłączona do węzła centralnego, równolegle z rezystorem R_1 = 1 kΩ.<br><br>
+            <strong>2. Analiza wykresów (Oscyloskop):</strong><br>
+            Na górnym panelu widoczne są dwa przebiegi czasowe:<br>
+            Przebieg zielony (górny): Przedstawia składową stałą z nałożoną sinusoidą/tętnieniami (tzw. napięcie tętniące z offsetem DC).<br>
+            Przebieg żółty (dolny): Pokazuje jednopołówkowo wyprostowany sygnał.
+        </p>
+
+        <img src="/zdjecie8.jpg" alt="Moje testowe zdjęcie" class="responsive-img" onclick="wypowiedzKomunikat('Artefakt w Chrzanowie Małym')">
+        <p>Artefakt znaleziony w Chrzanowie Małym. Pozostałości po rozbitym samolocie transportowym z czasów II Wojny Światowej.</p>
+
+        <img src="/zdjecie9.jpg" alt="Moje testowe zdjęcie" class="responsive-img" onclick="wypowiedzKomunikat('Widok z hotelu w Katowicach')">
+        <p>Widok z okna w Hotelu Katowice</p>
+
+        <img src="/zdjecie10.jpg" alt="Moje testowe zdjęcie" class="responsive-img" onclick="wypowiedzKomunikat('Zdjęcie numer dziesięć')">
+        <img src="/zdjecie11.jpg" alt="Moje testowe zdjęcie" class="responsive-img" onclick="wypowiedzKomunikat('Zdjęcie numer jedenaście')">
+
+        <!-- PANEL STEROWANIA ESP32 -->
+        <h2>Panel Sterowania Urządzeniami Domowymi</h2>
+
+        <div class="esp-card">
+            <h3>Urządzenie 1 (Warsztat)</h3>
+            <p class="esp-status-text">Stan: <span id="status-dev1" class="status-badge">Sprawdzanie...</span></p>
+            <button class="btn btn-on" onclick="controlDevice('http://192.168.8.102', 'przekaznik_1', 'turn_on', 'status-dev1', 'Warsztat włączony')">Włącz</button>
+            <button class="btn btn-off" onclick="controlDevice('http://192.168.8.102', 'przekaznik_1', 'turn_off', 'status-dev1', 'Warsztat wyłączony')">Wyłącz</button>
+            <button class="btn" onclick="controlDevice('http://192.168.8.102', 'przekaznik_1', 'toggle', 'status-dev1', 'Przełączono warsztat')">Przełącz</button>
+        </div>
+
+        <div class="esp-card">
+            <h3>Urządzenie 2 (Garaż)</h3>
+            <p class="esp-status-text">Stan: <span id="status-dev2" class="status-badge">Sprawdzanie...</span></p>
+            <button class="btn btn-on" onclick="controlDevice('http://192.168.1.151', 'przekaznik_garaz', 'turn_on', 'status-dev2', 'Garaż włączony')">Włącz</button>
+            <button class="btn btn-off" onclick="controlDevice('http://192.168.1.151', 'przekaznik_garaz', 'turn_off', 'status-dev2', 'Garaż wyłączony')">Wyłącz</button>
+            <button class="btn" onclick="controlDevice('http://192.168.1.151', 'przekaznik_garaz', 'toggle', 'status-dev2', 'Przełączono garaż')">Przełącz</button>
+        </div>
+
+        <div class="esp-card">
+            <h3>Urządzenie 3</h3>
+            <p class="esp-status-text">Stan: <span id="status-dev3" class="status-badge">Sprawdzanie...</span></p>
+            <button class="btn btn-on" onclick="controlDevice('http://192.168.1.152', 'przekaznik_3', 'turn_on', 'status-dev3', 'Urządzenie trzecie włączone')">Włącz</button>
+            <button class="btn btn-off" onclick="controlDevice('http://192.168.1.152', 'przekaznik_3', 'turn_off', 'status-dev3', 'Urządzenie trzecie wyłączone')">Wyłącz</button>
+            <button class="btn" onclick="controlDevice('http://192.168.1.152', 'przekaznik_3', 'toggle', 'status-dev3', 'Przełączono urządzenie trzecie')">Przełącz</button>
+        </div>
+    </main>
+
+    <!-- PRAWY BOCZNY PASEK -->
+    <aside class="sidebar-right">
+        <div class="section">
+            <h4>WWW</h4>
+            <div class="clickable-item" onclick="loadContent('https://www.google.com/search?igu=1', 'Otwieram wyszukiwarkę Google')">Google</div>
+        </div>
+
+        <div class="section">
+            <h4>Kalendarz</h4>
+            <ul>
+                <li class="clickable-item" onclick="loadContent('https://kalendarz.livecity.pl', 'Otwieram kalendarz główny')">1. Kalendarz Główny</li>
+                <li class="clickable-item" onclick="loadContent('https://calendar.google.com', 'Otwieram kalendarz Google')">2. Google Calendar</li>
+                <li class="clickable-item" onclick="loadContent('https://kalendarz.livecity.pl', 'Otwieram wydarzenia')">3. Wydarzenia</li>
+            </ul>
+        </div>
+    </aside>
+
+</div>
+
+<!-- STOPKA -->
+<footer>
+    &copy; 2026 Wszelkie prawa zastrzeżone.
+</footer>
+
+<!-- SKRYPTY JAVASCRIPT -->
+<script>
+    // --- FUNKCJA SYNTEZY MOWY (TEKST NA GŁOS) ---
+    function wypowiedzKomunikat(tekst) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); // Przerywa poprzedni komunikat, żeby się nie nakładały
+            const utterance = new SpeechSynthesisUtterance(tekst);
+            utterance.lang = 'pl-PL';
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    // Ładowanie zawartości do ramki głównej z opcjonalnym komunikatem głosowym
+    function loadContent(url, komunikat) {
+        if (komunikat) {
+            wypowiedzKomunikat(komunikat);
+        }
+        document.getElementById('main-display-frame').src = url;
+    }
+
+    // Usuwanie zakładek z nawigacji
+    function closeTab(button) {
+        button.parentElement.remove();
+    }
+
+    // Aktualizacja zegara w nagłówku
+    function updateDateTime() {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('pl-PL');
+        const timeStr = now.toLocaleTimeString('pl-PL');
+        document.getElementById('datetime').textContent = `${dateStr} | ${timeStr}`;
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    // Lista urządzeń ESP32
+    const devicesList = [
+        { ip: "http://192.168.8.102", switchId: "przekaznik_1", statusElId: "status-dev1" },
+        { ip: "http://192.168.1.151", switchId: "przekaznik_garaz", statusElId: "status-dev2" },
+        { ip: "http://192.168.1.152", switchId: "przekaznik_3", statusElId: "status-dev3" }
+    ];
+
+    // Wysyłanie polecenia do konkretnego urządzenia ESP32
+    async function controlDevice(ip, switchId, action, statusElId, komunikatGlosowy) {
+        if (komunikatGlosowy) {
+            wypowiedzKomunikat(komunikatGlosowy);
+        }
+
+        try {
+            await fetch(`${ip}/switch/${switchId}/${action}`, { method: 'POST' });
+            checkSingleDevice(ip, switchId, statusElId);
+        } catch (error) {
+            console.error(`Błąd połączenia z urządzeniem (${ip}):`, error);
+            wypowiedzKomunikat("Błąd połączenia z urządzeniem");
+            const statusEl = document.getElementById(statusElId);
+            if (statusEl) {
+                statusEl.innerText = "Błąd połączenia";
+                statusEl.className = "status-badge status-error";
+            }
+        }
+    }
+
+    // Pobieranie stanu urządzenia ESP32
+    async function checkSingleDevice(ip, switchId, statusElId) {
+        try {
+            const res = await fetch(`${ip}/switch/${switchId}`);
+            const data = await res.json();
+            const statusEl = document.getElementById(statusElId);
+
+            if (statusEl) {
+                if (data.value) {
+                    statusEl.innerText = "WŁĄCZONY";
+                    statusEl.className = "status-badge status-on";
+                } else {
+                    statusEl.innerText = "WYŁĄCZONY";
+                    statusEl.className = "status-badge status-off";
+                }
+            }
+        } catch (error) {
+            const statusEl = document.getElementById(statusElId);
+            if (statusEl) {
+                statusEl.innerText = "Brak połączenia";
+                statusEl.className = "status-badge status-error";
+            }
+        }
+    }
+
+    // Automatyczne sprawdzanie wszystkich urządzeń ESP32
+    function checkAllDevices() {
+        devicesList.forEach(dev => {
+            checkSingleDevice(dev.ip, dev.switchId, dev.statusElId);
+        });
+    }
+
+    setInterval(checkAllDevices, 3000);
+    checkAllDevices();
+</script>
+
+<script src="/script.js"></script>
+
+</body>
+</html>
